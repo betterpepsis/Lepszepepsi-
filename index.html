@@ -4,15 +4,73 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Lepsze Pepsi</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
   <style>
-    body { font-family: sans-serif; margin: 0; padding: 0; background: #f2f2f2; }
-    #map { height: 300px; width: 100%; }
-    form, #searchForm { padding: 1em; background: #fff; margin: 1em; border-radius: 10px; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
-    input, textarea, select, button {
-      display: block; width: 100%; padding: 0.6em; margin-bottom: 1em; border: 1px solid #ccc; border-radius: 5px;
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #0f1116;
+      color: #fff;
     }
-    h1 { text-align: center; padding: 1em 0; }
+
+    h1 {
+      text-align: center;
+      background: #1a1f2e;
+      margin: 0;
+      padding: 1em;
+      color: #00bfff;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+    }
+
+    #map {
+      height: 400px;
+      width: 100%;
+      filter: grayscale(20%);
+    }
+
+    form {
+      background: #1a1f2e;
+      padding: 1em;
+      margin: 1em;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0, 191, 255, 0.1);
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 0.7em;
+      margin-bottom: 1em;
+      border: none;
+      border-radius: 8px;
+      background: #2b2f3d;
+      color: #fff;
+    }
+
+    input::placeholder, textarea::placeholder, select {
+      color: #bbb;
+    }
+
+    button {
+      background: #00bfff;
+      color: #fff;
+      padding: 0.8em;
+      border: none;
+      width: 100%;
+      border-radius: 8px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #0099cc;
+    }
+
+    img {
+      max-width: 100%;
+      border-radius: 10px;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
@@ -32,18 +90,20 @@
     <option value="4">4</option>
     <option value="5">5 - Super</option>
   </select>
+  <select id="palletAccess" required>
+    <option value="">Wjazd paletą?</option>
+    <option value="Tak">Tak</option>
+    <option value="Nie">Nie</option>
+  </select>
+  <input type="file" id="photo" accept="image/*" />
   <button type="submit">Dodaj miejsce</button>
 </form>
 
-<form id="searchForm">
-  <input type="text" id="searchInput" placeholder="Wyszukaj miejsce po nazwie..." />
-</form>
-
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<!-- Firebase SDK -->
 <script type="module">
-  // === 1. Firebase Config – WLEJ TU SWÓJ ===
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+  import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+  import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-storage.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDSlED_07CPrKkzv-GaHko8yhLI93M6QUg",
@@ -56,18 +116,62 @@
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
+  const storage = getStorage(app);
 
-  // === 2. Mapa ===
-  const map = L.map('map').setView([52.237, 21.017], 6);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap',
-  }).addTo(map);
+  let map;
+  let markers = [];
 
-  // === 3. Dodawanie punktów ===
+  window.initMap = async function() {
+    map = new google.maps.Map(document.getElementById("map"), {
+      center: { lat: 52.237, lng: 21.017 },
+      zoom: 6,
+      styles: [
+        { elementType: 'geometry', stylers: [{color: '#1d2c4d'}] },
+        { elementType: 'labels.text.fill', stylers: [{color: '#8ec5ff'}] },
+        { elementType: 'labels.text.stroke', stylers: [{color: '#1a3646'}] },
+        {
+          featureType: 'road',
+          elementType: 'geometry',
+          stylers: [{color: '#304a7d'}]
+        }
+      ]
+    });
+
+    const placesSnapshot = await getDocs(collection(db, "places"));
+    placesSnapshot.forEach((doc) => {
+      const data = doc.data();
+      const position = { lat: data.lat, lng: data.lng };
+      const marker = new google.maps.Marker({
+        position,
+        map,
+        title: data.name,
+      });
+
+      const infoWindow = new google.maps.InfoWindow({
+        content: `
+          <div>
+            <h3>${data.name}</h3>
+            <p><strong>Ocena:</strong> ${data.rating}/5</p>
+            <p><strong>Wjazd paletą:</strong> ${data.palletAccess}</p>
+            <p>${data.desc}</p>
+            ${data.photoURL ? `<img src="${data.photoURL}" alt="Zdjęcie">` : ""}
+          </div>
+        `,
+      });
+
+      marker.addListener("click", () => {
+        infoWindow.open(map, marker);
+      });
+
+      markers.push(marker);
+    });
+  };
+
   document.getElementById('placeForm').addEventListener('submit', async function(e) {
     e.preventDefault();
+
     if (!navigator.geolocation) {
-      alert('Brak lokalizacji');
+      alert('Brak dostępu do lokalizacji.');
       return;
     }
 
@@ -75,46 +179,40 @@
       const name = document.getElementById('name').value;
       const desc = document.getElementById('desc').value;
       const rating = document.getElementById('rating').value;
+      const palletAccess = document.getElementById('palletAccess').value;
+      const photoFile = document.getElementById('photo').files[0];
 
       const lat = position.coords.latitude;
       const lng = position.coords.longitude;
 
+      let photoURL = "";
+
+      if (photoFile) {
+        const storageRef = ref(storage, 'images/' + photoFile.name);
+        await uploadBytes(storageRef, photoFile);
+        photoURL = await getDownloadURL(storageRef);
+      }
+
       await addDoc(collection(db, "places"), {
-        name, desc, rating, lat, lng
+        name,
+        desc,
+        rating,
+        palletAccess,
+        lat,
+        lng,
+        photoURL
       });
 
       alert("Dodano miejsce!");
       location.reload();
+    }, () => {
+      alert('Nie udało się uzyskać lokalizacji.');
     });
   });
+</script>
 
-  // === 4. Wyświetlanie wszystkich punktów ===
-  const places = await getDocs(collection(db, "places"));
-  places.forEach(doc => {
-    const data = doc.data();
-    const marker = L.marker([data.lat, data.lng]).addTo(map);
-    marker.bindPopup(`<b>${data.name}</b><br>Ocena: ${data.rating}/5<br>${data.desc}`);
-  });
-
-  // === 5. Wyszukiwarka ===
-  document.getElementById('searchForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const keyword = document.getElementById('searchInput').value.toLowerCase();
-    const q = query(collection(db, "places"), where("name", ">=", keyword), where("name", "<=", keyword + "\uf8ff"));
-
-    const results = await getDocs(q);
-    if (results.empty) {
-      alert("Nie znaleziono miejsca.");
-      return;
-    }
-
-    results.forEach(doc => {
-      const d = doc.data();
-      map.setView([d.lat, d.lng], 14);
-      const m = L.marker([d.lat, d.lng]).addTo(map);
-      m.bindPopup(`<b>${d.name}</b><br>Ocena: ${d.rating}/5<br>${d.desc}`).openPopup();
-    });
-  });
+<script async
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDeS5C0tye-TM0FUvvjf_aOiP4fBiwHzQc&callback=initMap">
 </script>
 
 </body>
