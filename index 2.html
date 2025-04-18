@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LepszePepsi</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDeS5C0tye-TM0FUvvjf_aOiP4fBiwHzQc&libraries=places"></script>
+</head>
+<body>
+  <header>
+    <h1>LepszePepsi</h1>
+    <nav>
+      <button onclick="showSection('add')">Dodaj miejsce</button>
+      <button onclick="showSection('latest')">Najnowsze</button>
+      <button onclick="showSection('favorites')">Ulubione</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="map"></section>
+    
+    <section id="add" class="hidden">
+      <h2>Dodaj miejsce</h2>
+      <form id="placeForm">
+        <input type="text" placeholder="Nazwa" id="name" required />
+        <textarea placeholder="Opis (max 500 słów)" id="desc" required></textarea>
+        <select id="pallet">
+          <option value="Tak">Wjazd paletą: Tak</option>
+          <option value="Nie">Wjazd paletą: Nie</option>
+        </select>
+        <input type="number" placeholder="Ocena (1-5)" id="rating" min="1" max="5" required />
+        <input type="file" id="photo" />
+        <button type="submit">Dodaj</button>
+      </form>
+    </section>
+
+    <section id="latest" class="hidden">
+      <h2>Najnowsze miejsca</h2>
+      <div id="placesList"></div>
+    </section>
+  </main>
+
+  <script src="app.js" type="module"></script>
+</body>
+</html>
