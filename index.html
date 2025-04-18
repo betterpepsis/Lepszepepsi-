@@ -2,36 +2,28 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Lepsze Pepsi</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
   <style>
-    body { font-family: sans-serif; margin: 0; padding: 0; background: #f9f9f9; }
-    h1 { text-align: center; padding: 1em 0; }
+    body { font-family: sans-serif; margin: 0; padding: 0; background: #f2f2f2; }
     #map { height: 300px; width: 100%; }
-    form { padding: 1em; background: #fff; margin: 1em; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    form, #searchForm { padding: 1em; background: #fff; margin: 1em; border-radius: 10px; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
     input, textarea, select, button {
-      display: block;
-      width: 100%;
-      padding: 0.6em;
-      margin-bottom: 1em;
-      border: 1px solid #ccc;
-      border-radius: 5px;
+      display: block; width: 100%; padding: 0.6em; margin-bottom: 1em; border: 1px solid #ccc; border-radius: 5px;
     }
-    .marker-info {
-      font-size: 0.9em;
-      line-height: 1.4;
-    }
+    h1 { text-align: center; padding: 1em 0; }
   </style>
 </head>
 <body>
 
 <h1>Lepsze Pepsi – Twoje Miejsca</h1>
+
 <div id="map"></div>
 
 <form id="placeForm">
-  <input type="text" id="name" placeholder="Nazwa miejsca (np. Orlen)" required />
-  <textarea id="desc" placeholder="Opis miejsca (max 500 słów)" maxlength="2000" required></textarea>
+  <input type="text" id="name" placeholder="Nazwa miejsca" required />
+  <textarea id="desc" placeholder="Opis (max 500 słów)" maxlength="2000" required></textarea>
   <select id="rating" required>
     <option value="">Ocena obsługi</option>
     <option value="1">1 - Słabo</option>
@@ -43,23 +35,43 @@
   <button type="submit">Dodaj miejsce</button>
 </form>
 
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script>
-  const map = L.map('map').setView([52.237049, 21.017532], 6); // Polska
+<form id="searchForm">
+  <input type="text" id="searchInput" placeholder="Wyszukaj miejsce po nazwie..." />
+</form>
 
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script type="module">
+  // === 1. Firebase Config – WLEJ TU SWÓJ ===
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "TWOJE_API_KEY",
+    authDomain: "TWOJE_AUTH_DOMAIN",
+    projectId: "TWOJE_PROJECT_ID",
+    storageBucket: "TWOJE_STORAGE_BUCKET",
+    messagingSenderId: "TWOJE_MESSAGING_SENDER_ID",
+    appId: "TWOJE_APP_ID"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // === 2. Mapa ===
+  const map = L.map('map').setView([52.237, 21.017], 6);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap',
   }).addTo(map);
 
-  // Obsługa formularza
-  document.getElementById('placeForm').addEventListener('submit', function(e) {
+  // === 3. Dodawanie punktów ===
+  document.getElementById('placeForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     if (!navigator.geolocation) {
-      alert('Twoja przeglądarka nie obsługuje lokalizacji.');
+      alert('Brak lokalizacji');
       return;
     }
 
-    navigator.geolocation.getCurrentPosition(function(position) {
+    navigator.geolocation.getCurrentPosition(async position => {
       const name = document.getElementById('name').value;
       const desc = document.getElementById('desc').value;
       const rating = document.getElementById('rating').value;
@@ -67,10 +79,40 @@
       const lat = position.coords.latitude;
       const lng = position.coords.longitude;
 
-      const marker = L.marker([lat, lng]).addTo(map);
-      marker.bindPopup(`<div class="marker-info"><strong>${name}</strong><br>Ocena: ${rating}/5<br><br>${desc}</div>`).openPopup();
+      await addDoc(collection(db, "places"), {
+        name, desc, rating, lat, lng
+      });
 
-      document.getElementById('placeForm').reset();
+      alert("Dodano miejsce!");
+      location.reload();
+    });
+  });
+
+  // === 4. Wyświetlanie wszystkich punktów ===
+  const places = await getDocs(collection(db, "places"));
+  places.forEach(doc => {
+    const data = doc.data();
+    const marker = L.marker([data.lat, data.lng]).addTo(map);
+    marker.bindPopup(`<b>${data.name}</b><br>Ocena: ${data.rating}/5<br>${data.desc}`);
+  });
+
+  // === 5. Wyszukiwarka ===
+  document.getElementById('searchForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const keyword = document.getElementById('searchInput').value.toLowerCase();
+    const q = query(collection(db, "places"), where("name", ">=", keyword), where("name", "<=", keyword + "\uf8ff"));
+
+    const results = await getDocs(q);
+    if (results.empty) {
+      alert("Nie znaleziono miejsca.");
+      return;
+    }
+
+    results.forEach(doc => {
+      const d = doc.data();
+      map.setView([d.lat, d.lng], 14);
+      const m = L.marker([d.lat, d.lng]).addTo(map);
+      m.bindPopup(`<b>${d.name}</b><br>Ocena: ${d.rating}/5<br>${d.desc}`).openPopup();
     });
   });
 </script>
