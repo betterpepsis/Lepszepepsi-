@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lepsze Pepsi</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    body { font-family: sans-serif; margin: 0; padding: 0; background: #f9f9f9; }
+    h1 { text-align: center; padding: 1em 0; }
+    #map { height: 300px; width: 100%; }
+    form { padding: 1em; background: #fff; margin: 1em; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    input, textarea, select, button {
+      display: block;
+      width: 100%;
+      padding: 0.6em;
+      margin-bottom: 1em;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .marker-info {
+      font-size: 0.9em;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Lepsze Pepsi – Twoje Miejsca</h1>
+<div id="map"></div>
+
+<form id="placeForm">
+  <input type="text" id="name" placeholder="Nazwa miejsca (np. Orlen)" required />
+  <textarea id="desc" placeholder="Opis miejsca (max 500 słów)" maxlength="2000" required></textarea>
+  <select id="rating" required>
+    <option value="">Ocena obsługi</option>
+    <option value="1">1 - Słabo</option>
+    <option value="2">2</option>
+    <option value="3">3 - OK</option>
+    <option value="4">4</option>
+    <option value="5">5 - Super</option>
+  </select>
+  <button type="submit">Dodaj miejsce</button>
+</form>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+  const map = L.map('map').setView([52.237049, 21.017532], 6); // Polska
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap',
+  }).addTo(map);
+
+  // Obsługa formularza
+  document.getElementById('placeForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    if (!navigator.geolocation) {
+      alert('Twoja przeglądarka nie obsługuje lokalizacji.');
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(function(position) {
+      const name = document.getElementById('name').value;
+      const desc = document.getElementById('desc').value;
+      const rating = document.getElementById('rating').value;
+
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
+
+      const marker = L.marker([lat, lng]).addTo(map);
+      marker.bindPopup(`<div class="marker-info"><strong>${name}</strong><br>Ocena: ${rating}/5<br><br>${desc}</div>`).openPopup();
+
+      document.getElementById('placeForm').reset();
+    });
+  });
+</script>
+
+</body>
+</html>
