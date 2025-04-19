@@ -1,0 +1,103 @@
+
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LepszePepsi - Dla Kurierów</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #0d0d0d;
+      color: #f0f0f0;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #111;
+      padding: 1rem;
+      text-align: center;
+      border-bottom: 2px solid #007bff;
+    }
+    header h1 {
+      margin: 0;
+      color: #ffffff;
+    }
+    .search-bar {
+      padding: 1rem;
+      text-align: center;
+      background-color: #1a1a1a;
+    }
+    .search-bar input {
+      width: 90%;
+      max-width: 500px;
+      padding: 0.5rem;
+      border: none;
+      border-radius: 5px;
+    }
+    .section {
+      padding: 2rem;
+      text-align: center;
+    }
+    .section h2 {
+      color: #00aaff;
+    }
+    .button {
+      background-color: #007bff;
+      color: white;
+      padding: 0.8rem 1.5rem;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
+    .info-box {
+      margin: 1.5rem auto;
+      max-width: 600px;
+      padding: 1rem;
+      background-color: #1e1e1e;
+      border-left: 4px solid #00aaff;
+      border-radius: 5px;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>LepszePepsi</h1>
+    <p>Pomoc dla kurierów dostarczających Pepsi i inne produkty</p>
+  </header>
+
+  <div class="search-bar">
+    <input type="text" placeholder="Wyszukaj punkt, adres, miejscowość..."/>
+  </div>
+
+  <div class="section">
+    <h2>Dodaj punkt dostawy</h2>
+    <p>Podziel się informacją o lokalizacji, godzinach, obsłudze i oceną punktu!</p>
+    <button class="button" onclick="alert('Dodawanie punktu wkrótce!')">Dodaj teraz</button>
+  </div>
+
+  <div class="section">
+    <h2>Ostatnio dodane punkty</h2>
+    <div class="info-box">
+      <strong>Orlen - Poznań</strong><br/>
+      Adres: ul. Przykładowa 10<br/>
+      Godziny: 06:00 - 22:00<br/>
+      Obsługa: Miła<br/>
+      Ocena: ★★★★☆
+    </div>
+    <div class="info-box">
+      <strong>Biedronka - Warszawa</strong><br/>
+      Adres: ul. Długa 5<br/>
+      Godziny: 07:00 - 21:00<br/>
+      Obsługa: Średnia<br/>
+      Ocena: ★★★☆☆
+    </div>
+  </div>
+
+</body>
+</html>
