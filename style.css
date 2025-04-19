@@ -1,110 +1,92 @@
 body {
-  margin: 0;
   font-family: 'Inter', sans-serif;
   background-color: #0d0d0d;
   color: #f0f0f0;
+  margin: 0;
+  padding: 0;
 }
-
 header {
   background-color: #111;
   padding: 1rem;
   text-align: center;
   border-bottom: 2px solid #007bff;
 }
-
-.top-bar input {
+.logo-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.logo {
+  height: 40px;
+  margin-right: 10px;
+}
+.search-bar {
+  padding: 1rem;
+  text-align: center;
+  background-color: #1a1a1a;
+}
+.search-bar input {
   width: 90%;
   max-width: 500px;
-  padding: 0.6rem;
-  border-radius: 10px;
+  padding: 0.5rem;
   border: none;
-  font-size: 1rem;
+  border-radius: 5px;
 }
-
-.logo-container {
+.menu {
   display: flex;
   justify-content: center;
-  align-items: center;
-  gap: 10px;
-  margin: 1rem 0;
-}
-
-.logo-container img {
-  height: 40px;
-}
-
-.logo-container h1 {
-  margin: 0;
-  font-size: 1.5rem;
-}
-
-.pepsi-color {
-  color: #007bff;
-}
-
-.menu-button {
-  background-color: #007bff;
-  color: white;
-  padding: 0.6rem 1rem;
-  border-radius: 10px;
-  margin: 10px auto;
-  width: fit-content;
-  cursor: pointer;
-}
-
-nav.hidden {
-  display: none;
-}
-
-nav ul {
-  list-style: none;
-  padding: 0;
-  margin: 1rem auto;
-  text-align: center;
-}
-
-nav ul li {
-  background: #1a1a1a;
-  margin: 0.3rem;
+  gap: 1rem;
   padding: 1rem;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: 0.3s;
 }
-
-nav ul li:hover {
+.menu button {
   background-color: #007bff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
 }
-
-.intro {
+.section {
+  padding: 1.5rem;
   text-align: center;
-  padding: 2rem;
 }
-
 .button {
   background-color: #007bff;
   color: white;
-  padding: 1rem 2rem;
-  border-radius: 10px;
+  padding: 0.8rem 1.5rem;
   border: none;
+  border-radius: 5px;
   font-size: 1rem;
   cursor: pointer;
-  transition: 0.3s;
+  margin-top: 1rem;
 }
-
-.button:hover {
-  background-color: #0056b3;
+input, textarea, select {
+  width: 90%;
+  max-width: 500px;
+  margin: 0.5rem auto;
+  display: block;
+  padding: 0.5rem;
+  border-radius: 5px;
+  border: none;
 }
-
-#pointsList {
-  padding: 1rem;
+.stars {
+  margin: 0.5rem;
 }
-
-.point-box {
+.star {
+  font-size: 2rem;
+  cursor: pointer;
+  color: #ccc;
+}
+.star.selected {
+  color: gold;
+}
+.info-box {
   background-color: #1e1e1e;
+  border-left: 4px solid #00aaff;
   padding: 1rem;
   margin: 1rem auto;
-  border-radius: 10px;
-  border-left: 4px solid #00aaff;
   max-width: 600px;
+  border-radius: 5px;
+  text-align: left;
 }
