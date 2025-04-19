@@ -1,104 +1,75 @@
-
 <!DOCTYPE html>
 <html lang="pl">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>LepszePepsi - Dla Kurierów</title>
+  <title>LepszePepsi</title>
+  <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
-  <style>
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: #0d0d0d;
-      color: #f0f0f0;
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      background-color: #111;
-      padding: 1.5rem;
-      text-align: center;
-      border-bottom: 2px solid #007bff;
-    }
-    header img {
-      height: 50px;
-      vertical-align: middle;
-      margin-right: 10px;
-    }
-    header h1 {
-      display: inline;
-      font-size: 2rem;
-      color: #00aaff;
-    }
-    .search-bar {
-      padding: 1rem;
-      text-align: center;
-      background-color: #1a1a1a;
-    }
-    .search-bar input {
-      width: 90%;
-      max-width: 500px;
-      padding: 0.8rem;
-      border: none;
-      border-radius: 10px;
-      font-size: 1rem;
-    }
-    .section {
-      padding: 2rem;
-      text-align: center;
-    }
-    .section h2 {
-      color: #00aaff;
-    }
-    .button {
-      background-color: #007bff;
-      color: white;
-      padding: 0.8rem 1.5rem;
-      border: none;
-      border-radius: 10px;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background-color 0.3s, transform 0.2s;
-    }
-    .button:hover {
-      background-color: #005fcc;
-      transform: scale(1.05);
-    }
-    .info-box {
-      margin: 1.5rem auto;
-      max-width: 600px;
-      padding: 1rem;
-      background-color: #1e1e1e;
-      border-left: 4px solid #00aaff;
-      border-radius: 10px;
-      text-align: left;
-      box-shadow: 0 0 10px rgba(0,0,0,0.3);
-    }
-  </style>
 </head>
 <body>
-
   <header>
-    <img src="https://upload.wikimedia.org/wikipedia/commons/8/87/Pepsi_logo_2014.svg" alt="Pepsi Logo">
-    <h1>LepszePepsi</h1>
+    <div class="logo-row">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/7/73/Pepsi_logo_2014.svg" class="logo" />
+      <h1><span>Lepsze</span>Pepsi</h1>
+    </div>
     <p>Pomoc dla kurierów dostarczających Pepsi i inne produkty</p>
   </header>
 
   <div class="search-bar">
-    <input type="text" placeholder="Szukaj punktu, adresu..."/>
+    <input type="text" id="searchInput" placeholder="Szukaj punktu, adresu, miasta..."/>
   </div>
 
-  <div class="section">
-    <h2>Dodaj punkt dostawy</h2>
-    <p>Podziel się informacją o lokalizacji, godzinach, obsłudze i oceną punktu!</p>
-    <button class="button" onclick="window.location.href='form.html'">Dodaj teraz</button>
+  <nav class="menu">
+    <button onclick="showSection('recent')">Ostatnio dodane</button>
+    <button onclick="showSection('top')">Najlepiej oceniane</button>
+    <button onclick="showForm()">Opisz punkt</button>
+  </nav>
+
+  <div class="section" id="welcome">
+    <h2>Witaj na Lepsze Pepsi</h2>
+    <p>Możesz pomóc innym dostawcom publikując opisy punktów.</p>
+    <button class="button" onclick="showSection('recent')">Sprawdź wszystkie punkty</button>
   </div>
 
-  <div class="section" id="points-section">
-    <h2>Ostatnio dodane punkty</h2>
-    <div id="points-container"></div>
+  <div class="section" id="points"></div>
+
+  <div class="section" id="formSection" style="display:none;">
+    <h2>Dodaj punkt</h2>
+    <form id="pointForm">
+      <input type="text" placeholder="Twoje imię" required />
+      <input type="text" placeholder="Nazwa punktu" required />
+      <input type="text" placeholder="Adres punktu" required />
+      <input type="text" placeholder="Godziny otwarcia (np. 7:00)" />
+      <input type="text" placeholder="Godziny zamknięcia (np. 17:00)" />
+      <textarea placeholder="Opinia o obsłudze"></textarea>
+      <div class="stars">
+        <label>Ocena:</label>
+        <div id="starsContainer">
+          <span class="star" data-star="1">☆</span>
+          <span class="star" data-star="2">☆</span>
+          <span class="star" data-star="3">☆</span>
+          <span class="star" data-star="4">☆</span>
+          <span class="star" data-star="5">☆</span>
+        </div>
+      </div>
+      <label>Możliwość wjazdu paletą: 
+        <select>
+          <option>Tak</option>
+          <option>Nie</option>
+        </select>
+      </label>
+      <label>Magazyn: 
+        <select>
+          <option>Tak</option>
+          <option>Nie</option>
+        </select>
+      </label>
+      <input type="text" id="locationInput" placeholder="Kliknij by pobrać lokalizację" onclick="getLocation()" readonly />
+      <button type="submit" class="button">Napisz opis punktu</button>
+    </form>
   </div>
 
-  <script type="module" src="firebase.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
