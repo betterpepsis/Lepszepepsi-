@@ -1,1 +1,115 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Lepsze Pepsi</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <h2>Znajdź punkt</h2>
+    <input type="text" placeholder="Szukaj...">
+    <div class="logo-title">
+      <img class="logo" src="img/pepsi_logo.png" alt="Pepsi Logo">
+      <span class="pepsi">Lepsze <strong style="color:#ffffff;">Pepsi</strong></span>
+    </div>
+    <div class="menu-toggle" onclick="toggleMenu()">☰ Menu</div>
+  </header>
 
+  <nav class="menu" id="mainMenu">
+    <ul>
+      <li><a href="#">Najlepiej oceniane</a></li>
+      <li><a href="#">Ostatnio dodane punkty</a></li>
+      <li><a href="#form">Napisz opis punktu</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <h1>Witaj na <strong>Lepsze Pepsi</strong></h1>
+    <p>Możesz na tej stronie pomóc innym dostawcom publikując opisy punktów.</p>
+    <button onclick="scrollToForm()">Sprawdź wszystkie punkty</button>
+
+    <hr><br>
+
+    <section id="form">
+      <h2>Napisz opis punktu</h2>
+      <form>
+        <input type="text" placeholder="Nazwa osoby piszącej" required>
+        <input type="text" placeholder="Nazwa punktu" required>
+        <input type="text" placeholder="Adres punktu" required>
+        <input type="time" placeholder="Godzina otwarcia" required>
+        <input type="time" placeholder="Godzina zamknięcia" required>
+        <textarea placeholder="Ogólna opinia punktu" rows="4"></textarea>
+
+        <label>Czy jest magazyn?</label>
+        <select>
+          <option>Tak</option>
+          <option>Nie</option>
+        </select>
+
+        <label>Możliwość wjazdu paletą?</label>
+        <select>
+          <option>Tak</option>
+          <option>Nie</option>
+        </select>
+
+        <label>Ocena obsługi:</label>
+        <div class="stars">
+          <span>☆</span><span>☆</span><span>☆</span><span>☆</span><span>☆</span>
+        </div>
+
+        <button type="button" onclick="getLocation()">Pobierz lokalizację</button>
+        <p id="locationLink"></p>
+
+        <button type="submit">Napisz opis punktu</button>
+      </form>
+    </section>
+
+    <hr><br>
+
+    <section id="recent">
+      <h2>Ostatnio dodane</h2>
+      <p>Tu będą pojawiać się ostatnie komentarze/opinie.</p>
+      <!-- Przykładowy wpis -->
+      <div>
+        <strong>Magazyn Pepsi Gdańsk</strong><br>
+        Ocena: ★★★★☆<br>
+        <a href="https://maps.google.com/?q=54.3520,18.6466" target="_blank">Kliknij aby zobaczyć punkt w Google Maps</a>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    function toggleMenu() {
+      const menu = document.getElementById("mainMenu");
+      menu.style.display = menu.style.display === "block" ? "none" : "block";
+    }
+
+    function scrollToForm() {
+      document.getElementById("form").scrollIntoView({ behavior: "smooth" });
+    }
+
+    const stars = document.querySelectorAll('.stars span');
+    stars.forEach((star, index) => {
+      star.addEventListener('click', () => {
+        stars.forEach((s, i) => {
+          s.classList.toggle('selected', i <= index);
+        });
+      });
+    });
+
+    function getLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(position => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          const link = `https://maps.google.com/?q=${lat},${lng}`;
+          document.getElementById("locationLink").innerHTML = `<a href="${link}" target="_blank">Kliknij aby zobaczyć punkt w Google Maps</a>`;
+        });
+      } else {
+        alert("Geolokalizacja niedostępna.");
+      }
+    }
+  </script>
+</body>
+</html>
