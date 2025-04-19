@@ -1,75 +1,48 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="pl">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>LepszePepsi</title>
-  <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+
   <header>
-    <div class="logo-row">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/7/73/Pepsi_logo_2014.svg" class="logo" />
-      <h1><span>Lepsze</span>Pepsi</h1>
+    <div class="top-bar">
+      <input type="text" id="searchBar" placeholder="Szukaj punktu, adresu...">
     </div>
-    <p>Pomoc dla kurierów dostarczających Pepsi i inne produkty</p>
+    <div class="logo-container">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/9/9b/Pepsi_Logo_2014.svg" alt="Pepsi logo">
+      <h1>Lepsze <span class="pepsi-color">Pepsi</span></h1>
+    </div>
+    <div class="menu-button" onclick="toggleMenu()">☰ Menu</div>
   </header>
 
-  <div class="search-bar">
-    <input type="text" id="searchInput" placeholder="Szukaj punktu, adresu, miasta..."/>
-  </div>
-
-  <nav class="menu">
-    <button onclick="showSection('recent')">Ostatnio dodane</button>
-    <button onclick="showSection('top')">Najlepiej oceniane</button>
-    <button onclick="showForm()">Opisz punkt</button>
+  <nav id="menu" class="hidden">
+    <ul>
+      <li onclick="loadBestRated()">Najlepiej oceniane</li>
+      <li onclick="loadLatest()">Ostatnio dodane</li>
+      <li onclick="goToAddForm()">Napisz opis punktu</li>
+    </ul>
   </nav>
 
-  <div class="section" id="welcome">
-    <h2>Witaj na Lepsze Pepsi</h2>
-    <p>Możesz pomóc innym dostawcom publikując opisy punktów.</p>
-    <button class="button" onclick="showSection('recent')">Sprawdź wszystkie punkty</button>
-  </div>
+  <main>
+    <section class="intro">
+      <h2><strong>Witaj na LepszePepsi</strong></h2>
+      <p>Możesz na tej stronie pomóc innym dostawcom publikując opisy punktów.</p>
+      <button class="button" onclick="loadAllPoints()">Sprawdź wszystkie punkty</button>
+    </section>
 
-  <div class="section" id="points"></div>
+    <section id="pointsList">
+      <!-- Tu będą dodane punkty z Firebase -->
+    </section>
+  </main>
 
-  <div class="section" id="formSection" style="display:none;">
-    <h2>Dodaj punkt</h2>
-    <form id="pointForm">
-      <input type="text" placeholder="Twoje imię" required />
-      <input type="text" placeholder="Nazwa punktu" required />
-      <input type="text" placeholder="Adres punktu" required />
-      <input type="text" placeholder="Godziny otwarcia (np. 7:00)" />
-      <input type="text" placeholder="Godziny zamknięcia (np. 17:00)" />
-      <textarea placeholder="Opinia o obsłudze"></textarea>
-      <div class="stars">
-        <label>Ocena:</label>
-        <div id="starsContainer">
-          <span class="star" data-star="1">☆</span>
-          <span class="star" data-star="2">☆</span>
-          <span class="star" data-star="3">☆</span>
-          <span class="star" data-star="4">☆</span>
-          <span class="star" data-star="5">☆</span>
-        </div>
-      </div>
-      <label>Możliwość wjazdu paletą: 
-        <select>
-          <option>Tak</option>
-          <option>Nie</option>
-        </select>
-      </label>
-      <label>Magazyn: 
-        <select>
-          <option>Tak</option>
-          <option>Nie</option>
-        </select>
-      </label>
-      <input type="text" id="locationInput" placeholder="Kliknij by pobrać lokalizację" onclick="getLocation()" readonly />
-      <button type="submit" class="button">Napisz opis punktu</button>
-    </form>
-  </div>
-
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  <script src="config.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
